@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>JanSewak — Pitch Deck</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; background: #1c1917; font-family: "Noto Sans Devanagari", system-ui, -apple-system, sans-serif; }
+  .deck { height: 100%; display: flex; align-items: center; justify-content: center; }
+  .slide {
+    display: none; width: min(100vw, 177.78vh); aspect-ratio: 16/9;
+    background: #FFF7EC; color: #292524; position: relative; overflow: hidden;
+    flex-direction: column; justify-content: center; padding: 6% 8%;
+  }
+  .slide.active { display: flex; }
+  .tricolor { position: absolute; top: 0; left: 0; right: 0; height: 10px; display: flex; }
+  .tricolor div { flex: 1; }
+  .tricolor .o { background: #f97316; } .tricolor .w { background: #fff; } .tricolor .g { background: #16a34a; }
+  .tricolor.bottom { top: auto; bottom: 0; }
+  .kicker { font-size: 1.1vw; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: #c2410c; margin-bottom: 1.2vw; }
+  h1 { font-size: 4.6vw; font-weight: 800; line-height: 1.15; }
+  h2 { font-size: 3.4vw; font-weight: 800; line-height: 1.2; margin-bottom: 2vw; }
+  .accent { color: #ea580c; }
+  .sub { font-size: 1.7vw; color: #57534e; margin-top: 1.4vw; line-height: 1.5; }
+  ul.big { list-style: none; margin-top: 1vw; }
+  ul.big li { font-size: 1.9vw; line-height: 1.5; padding: .7vw 0 .7vw 3vw; position: relative; color: #44403c; }
+  ul.big li::before { content: attr(data-ico); position: absolute; left: 0; }
+  ul.big li b { color: #1c1917; }
+  .url { display: inline-block; margin-top: 2.2vw; background: #047857; color: #fff; font-weight: 700; font-size: 1.8vw; padding: 1vw 2.2vw; border-radius: 99px; }
+  .badge { position: absolute; bottom: 4%; right: 5%; font-size: 1.1vw; color: #a8a29e; font-weight: 600; }
+  .counter { position: fixed; bottom: 12px; right: 16px; color: #78716c; font: 600 12px system-ui; z-index: 9; }
+  .center { align-items: center; text-align: center; }
+  .namaste { font-size: 7vw; margin-bottom: 1vw; }
+  /* architecture diagram */
+  .arch { display: flex; align-items: stretch; gap: 1.6vw; margin-top: 1vw; }
+  .arch .col { flex: 1; display: flex; flex-direction: column; gap: 1vw; }
+  .box { background: #fff; border: .18vw solid #fdba74; border-radius: 1vw; padding: 1.1vw 1.3vw; font-size: 1.35vw; line-height: 1.4; box-shadow: 0 .3vw .8vw rgba(234,88,12,.08); }
+  .box b { display: block; font-size: 1.5vw; margin-bottom: .3vw; }
+  .box.green { border-color: #6ee7b7; }
+  .box.violet { border-color: #c4b5fd; }
+  .arrow { align-self: center; font-size: 2.4vw; color: #ea580c; font-weight: 800; }
+  .cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 3vw; margin-top: 1vw; }
+  .demo-pill { font-size: 2.2vw; background: #fff; border: .2vw dashed #ea580c; border-radius: 1.2vw; padding: 1.6vw 2.4vw; margin-top: 2.4vw; font-weight: 700; color: #9a3412; }
+  .stat { font-size: 5.2vw; font-weight: 800; color: #ea580c; line-height: 1; }
+  .statlbl { font-size: 1.5vw; color: #57534e; margin-top: .6vw; }
+  .stats { display: flex; gap: 5vw; margin: 2vw 0 2.4vw; }
+</style>
+</head>
+<body>
+<div class="deck">
+
+  <!-- 1 · TITLE -->
+  <section class="slide active center">
+    <div class="tricolor"><div class="o"></div><div class="w"></div><div class="g"></div></div>
+    <div class="namaste">🙏</div>
+    <h1>जनसेवक <span class="accent">JanSewak</span></h1>
+    <p class="sub"><b>AI copilot for any government website.</b><br/>Talk in any Indian language — she finds the right portal, watches your screen, and guides every click.</p>
+    <div class="url">jansewak.vercel.app</div>
+    <div class="badge">Build What Moves India · 2026</div>
+    <div class="tricolor bottom"><div class="o"></div><div class="w"></div><div class="g"></div></div>
+  </section>
+
+  <!-- 2 · PROBLEM -->
+  <section class="slide">
+    <div class="tricolor"><div class="o"></div><div class="w"></div><div class="g"></div></div>
+    <div class="kicker">The problem</div>
+    <h2>Every Indian — farmer or engineer — needs a <span class="accent">guide</span> on sarkari websites.</h2>
+    <div class="stats">
+      <div><div class="stat">900M+</div><div class="statlbl">Indians online — most more comfortable<br/>speaking than typing</div></div>
+      <div><div class="stat">1 form</div><div class="statlbl">wrong = a day's wage at a cyber café,<br/>or a missed pension / ticket / scheme</div></div>
+    </div>
+    <ul class="big">
+      <li data-ico="🗺️">Which portal? Which of the 40 links? Is this site even real?</li>
+      <li data-ico="📺"><b>Even educated citizens hunt YouTube tutorials</b> — thousands exist, mostly outdated, and never about <i>your</i> screen or <i>your</i> case</li>
+      <li data-ico="📷">"Photo must be under 50KB" — a full stop for most citizens</li>
+    </ul>
+    <div class="badge">jansewak.vercel.app</div>
+  </section>
+
+  <!-- 3 · DEMO INTRO -->
+  <section class="slide center">
+    <div class="tricolor"><div class="o"></div><div class="w"></div><div class="g"></div></div>
+    <div class="kicker">Meet JanSewak</div>
+    <h2>She <span class="accent">talks</span> in your language.<br/>She <span class="accent">sees</span> your screen.<br/>She <span class="accent">shows</span> every click.</h2>
+    <p class="sub">A lifelike 3D sahayak — like sitting beside a real agent, not typing at a bot.</p>
+    <div class="demo-pill">▶ LIVE DEMO — watch a citizen navigate a cyber crime complaint on the actual govt website, just by talking</div>
+    <div class="badge">jansewak.vercel.app</div>
+    <div class="tricolor bottom"><div class="o"></div><div class="w"></div><div class="g"></div></div>
+  </section>
+
+  <!-- 4 · ROUND 2 IMPROVEMENTS -->
+  <section class="slide">
+    <div class="tricolor"><div class="o"></div><div class="w"></div><div class="g"></div></div>
+    <div class="kicker">New in Round 2</div>
+    <h2>Same mission — a far more <span class="accent">human</span> agent.</h2>
+    <div class="cols2">
+      <ul class="big">
+        <li data-ico="🧑‍💼"><b>Photoreal 3D sahayak</b> — real lip-sync, blinks, eye contact; a lifelike presence, not a sketch</li>
+        <li data-ico="🧠"><b>Self-driving guidance</b> — she sees a step finish on your screen and gives the next herself; your voice always overrides</li>
+        <li data-ico="⚡"><b>Inbuilt form agent</b> — guides or auto-fills a form while narrating, corrected by voice — no screen share needed</li>
+      </ul>
+      <ul class="big">
+        <li data-ico="🪪"><b>DigiLocker fetch (demo) + share-by-link</b> — family sends a link; the agent opens with your details loaded</li>
+        <li data-ico="🖥️"><b>Guide pops out on its own</b> — always-on-top window with live captions of both voices</li>
+        <li data-ico="🚨"><b>Cyber-fraud first aid</b> — 1930 in the golden hours, account freeze, cybercrime.gov.in — plus 400ms turn-taking</li>
+      </ul>
+    </div>
+    <div class="badge">jansewak.vercel.app</div>
+  </section>
+
+  <!-- 5 · FEATURES -->
+  <section class="slide">
+    <div class="tricolor"><div class="o"></div><div class="w"></div><div class="g"></div></div>
+    <div class="kicker">What she does</div>
+    <h2>One sahayak, <span class="accent">every sarkari need.</span></h2>
+    <div class="cols2">
+      <ul class="big">
+        <li data-ico="🗣️"><b>Voice-first, major Indian languages</b> — switch mid-sentence: "मराठी में बोलो"</li>
+        <li data-ico="🖥️"><b>Live screen guidance</b> — yellow highlights in an auto pop-out, always-on-top guide with live captions</li>
+        <li data-ico="⚡"><b>Auto-fill mode</b> — her inbuilt agent types the form herself, narrating each field — no screen share needed</li>
+        <li data-ico="📋"><b>Copy-ready form text</b> — on-device profile, DigiLocker fetch (demo), share-by-link for family</li>
+      </ul>
+      <ul class="big">
+        <li data-ico="🏛️"><b>Right portal & scheme discovery</b> — official sites only; any govt website works day one</li>
+        <li data-ico="🚨"><b>Cyber-fraud first aid</b> — call 1930 in the golden hours, freeze the account, then file on cybercrime.gov.in</li>
+        <li data-ico="📁"><b>Photo & signature resize</b> — to exact govt KB limits, built in</li>
+        <li data-ico="🔒"><b>Safe by design</b> — never asks OTP, Aadhaar or passwords; profile stays on device</li>
+      </ul>
+    </div>
+    <div class="badge">jansewak.vercel.app</div>
+  </section>
+
+  <!-- 5 · HOW WE BUILT IT -->
+  <section class="slide">
+    <div class="tricolor"><div class="o"></div><div class="w"></div><div class="g"></div></div>
+    <div class="kicker">How we built it</div>
+    <h2>One browser tab ↔ <span class="accent">Gemini Live</span>. No backend state, no scraping.</h2>
+    <div class="arch">
+      <div class="col">
+        <div class="box green"><b>🎙️ Citizen's browser</b>Next.js on Vercel · mic → 16kHz PCM · screen frames only when pixels change · photoreal 3D agent lip-syncs to her live voice</div>
+        <div class="box green"><b>🔐 Ephemeral tokens</b>API key never leaves the server — browser gets single-use tokens</div>
+      </div>
+      <div class="arrow">⇄</div>
+      <div class="col">
+        <div class="box violet"><b>✨ Gemini Live (native audio)</b>hears + sees in real time · speaks major Indian languages · Google Search fallback · auto-resumes dropped sessions</div>
+        <div class="box violet"><b>🛠️ Function calls drive the UI</b>highlight_region → yellow box on screen · provide_text → copy chips · open_file_tool → photo resizer</div>
+      </div>
+    </div>
+    <p class="sub" style="font-size:1.4vw">Latency engineered, not hoped for: measured configs (~3s to first word, 400ms end-of-speech VAD), echo gating, background-tab-proof capture, auto pop-out always-on-top guide with live captions.</p>
+    <div class="badge">github.com/pathakcodes/jansewak</div>
+  </section>
+
+  <!-- 5 · WHY THIS WAY -->
+  <section class="slide">
+    <div class="tricolor"><div class="o"></div><div class="w"></div><div class="g"></div></div>
+    <div class="kicker">Why we built it like this</div>
+    <h2>Works on <span class="accent">every govt website — today.</span></h2>
+    <div class="cols2">
+      <ul class="big">
+        <li data-ico="🏛️"><b>Zero changes needed from government</b> — she reads the real site's screen; portal redesigns take years, this ships now</li>
+        <li data-ico="📺"><b>A tutorial that's never outdated</b> — YouTube videos show someone else's 2019 screen; she guides on <i>your live screen, your case, your language</i></li>
+      </ul>
+      <ul class="big">
+        <li data-ico="👁️"><b>Showing beats telling</b> — chatbots recite steps; she highlights the exact button and hands you the text to paste</li>
+        <li data-ico="🔒"><b>Trust built in</b> — profile stays on device; she never asks for OTP, Aadhaar or passwords</li>
+      </ul>
+    </div>
+    <div class="badge">jansewak.vercel.app</div>
+  </section>
+
+  <!-- 6 · VISION + CLOSE -->
+  <section class="slide center">
+    <div class="tricolor"><div class="o"></div><div class="w"></div><div class="g"></div></div>
+    <div class="kicker">The road ahead</div>
+    <h2><span class="accent">Aaj:</span> she guides on any screen.<br/><span class="accent">Kal:</span> integrated into every govt website, with government support — no screen share needed.</h2>
+    <p class="sub">The copilot lives inside the portal itself — and JanSewak is the bridge that works today.<br/><b>हर सरकारी काम, अपनी भाषा में — बोलकर।</b></p>
+    <div class="url">jansewak.vercel.app</div>
+    <div class="badge">जनसेवक · Build What Moves India</div>
+    <div class="tricolor bottom"><div class="o"></div><div class="w"></div><div class="g"></div></div>
+  </section>
+
+</div>
+<div class="counter"><span id="cur">1</span>/<span id="total"></span> · ←/→ · F fullscreen</div>
+<script>
+  const slides = [...document.querySelectorAll(".slide")];
+  document.getElementById("total").textContent = slides.length;
+  let i = 0;
+  function show(n) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach((s, k) => s.classList.toggle("active", k === i));
+    document.getElementById("cur").textContent = i + 1;
+  }
+  addEventListener("keydown", (e) => {
+    if (["ArrowRight", " ", "PageDown"].includes(e.key)) show(i + 1);
+    if (["ArrowLeft", "PageUp"].includes(e.key)) show(i - 1);
+    if (e.key.toLowerCase() === "f") document.documentElement.requestFullscreen?.();
+  });
+  addEventListener("click", () => show(i + 1));
+  if (location.hash) show(parseInt(location.hash.slice(1), 10) - 1 || 0);
+</script>
+</body>
+</html>

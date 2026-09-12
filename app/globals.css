@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fff7ec;
+  --foreground: #292524;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-body);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body), "Noto Sans Devanagari", system-ui, sans-serif;
+}
+
+/* Avatar idle animations */
+@keyframes js-blink {
+  0%,
+  93%,
+  100% {
+    transform: scaleY(1);
+  }
+  95%,
+  97% {
+    transform: scaleY(0.08);
+  }
+}
+.js-blink {
+  animation: js-blink 4.6s infinite;
+  transform-origin: 100px 85px;
+}
+
+@keyframes js-breathe {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-1.5px) scale(1.006);
+  }
+}
+.js-breathe {
+  animation: js-breathe 3.8s ease-in-out infinite;
+  transform-origin: 100px 160px;
+}
+
+/* Gentle marquee for the portal strip on the landing page */
+@keyframes js-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.js-scroll {
+  animation: js-scroll 30s linear infinite;
+}

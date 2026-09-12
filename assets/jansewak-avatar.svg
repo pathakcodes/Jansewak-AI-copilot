@@ -1,0 +1,211 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 230" width="260" height="299" aria-label="JanSewak assistant avatar">
+        <style>
+  @keyframes blink{0%,93%,100%{transform:scaleY(1)}95%,97%{transform:scaleY(.08)}}
+  .js-blink{animation:blink 4.6s infinite;transform-origin:100px 85px}
+  @keyframes breathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.5px)}}
+  .js-breathe{animation:breathe 3.8s ease-in-out infinite;transform-origin:100px 160px}
+  @keyframes sway{0%,100%{transform:rotate(0deg)}30%{transform:rotate(1.5deg)}70%{transform:rotate(-1.5deg)}}
+  .head{animation:sway 6s ease-in-out infinite;transform-origin:100px 120px}
+  @keyframes talkOpen{0%,42%{opacity:1}48%,94%{opacity:0}100%{opacity:1}}
+  .mouth{animation:talkOpen 7s infinite}
+  @keyframes talkSmile{0%,42%{opacity:0}48%,94%{opacity:1}100%{opacity:0}}
+  .smile{animation:talkSmile 7s infinite}
+  @keyframes chew{0%,100%{transform:scaleY(.45)}50%{transform:scaleY(1.9)}}
+  .mouth-shape{animation:chew .34s ease-in-out infinite;transform-origin:100px 103px}
+</style><defs>
+          <radialGradient id="halo" cx="50%" cy="42%" r="60%">
+            <stop offset="0%" stop-color="#F3E8FF" />
+            <stop offset="100%" stop-color="#E9D5FF" stop-opacity="0" />
+          </radialGradient>
+          <linearGradient id="saree" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#7C3AED" />
+            <stop offset="100%" stop-color="#5B21B6" />
+          </linearGradient>
+          <linearGradient id="pallu" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#8B5CF6" />
+            <stop offset="100%" stop-color="#6D28D9" />
+          </linearGradient>
+          <linearGradient id="border" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#F4C430" />
+            <stop offset="100%" stop-color="#E8A712" />
+          </linearGradient>
+          <radialGradient id="skin" cx="50%" cy="42%" r="65%">
+            <stop offset="0%" stop-color="#D9A76E" />
+            <stop offset="70%" stop-color="#CB9256" />
+            <stop offset="100%" stop-color="#BC8148" />
+          </radialGradient>
+          <linearGradient id="hairGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#40301F" />
+            <stop offset="100%" stop-color="#1E140D" />
+          </linearGradient>
+          <linearGradient id="lipGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#B4574E" />
+            <stop offset="100%" stop-color="#93392F" />
+          </linearGradient>
+        </defs>
+
+        
+        <circle cx="100" cy="95" r="90" fill="url(#halo)" />
+
+        
+        <g class="js-breathe">
+          
+          <path d="M 52 230 C 52 168 68 140 100 140 C 132 140 148 168 148 230 Z" fill="url(#saree)" />
+          
+          <path d="M 100 140 C 122 146 136 170 140 230 L 112 230 C 108 184 100 160 84 148 Z" fill="url(#pallu)" />
+          
+          <path
+            d="M 84 148 C 100 160 108 184 112 230 L 118 230 C 114 182 106 156 90 145 Z"
+            fill="url(#border)"
+            opacity="0.9"
+          />
+          
+          <path d="M 84 143 C 92 152 108 152 116 143 C 110 140 90 140 84 143 Z" fill="#3B0764" />
+          
+          <path d="M 92 141 C 96 146 104 146 108 141" stroke="#F4C430" stroke-width="1.6" fill="none" stroke-linecap="round" />
+          <circle cx="100" cy="146" r="1.5" fill="#F4C430" />
+
+          
+          <g>
+            <path
+              d="M 100 162 C 96.5 164 94.2 170 93.6 178 C 93 188 94.5 197 97.5 201 C 98.4 202.2 99.2 202.8 100 202.8 L 100 162 Z"
+              fill="#C68642"
+            />
+            <path
+              d="M 100 162 C 103.5 164 105.8 170 106.4 178 C 107 188 105.5 197 102.5 201 C 101.6 202.2 100.8 202.8 100 202.8 L 100 162 Z"
+              fill="#B87333"
+            />
+            
+            <path d="M 100 156.5 C 98 157.5 96.6 160 96.6 163 C 97.6 161.6 98.8 160.9 100 160.9 C 101.2 160.9 102.4 161.6 103.4 163 C 103.4 160 102 157.5 100 156.5 Z" fill="#C68642" />
+            
+            <line x1="100" y1="162" x2="100" y2="202" stroke="#8A5A28" stroke-width="0.8" opacity="0.6" />
+            
+            <path d="M 96.8 174 C 95.8 177 95.6 181 96.2 184" stroke="#A9713A" stroke-width="1.2" fill="none" stroke-linecap="round" />
+            <path d="M 103.2 174 C 104.2 177 104.4 181 103.8 184" stroke="#A9713A" stroke-width="1.2" fill="none" stroke-linecap="round" />
+            
+            <path d="M 94.5 197.5 C 97 199.5 103 199.5 105.5 197.5" stroke="#F4C430" stroke-width="2.2" fill="none" stroke-linecap="round" />
+            <path d="M 94.9 200.5 C 97.2 202.2 102.8 202.2 105.1 200.5" stroke="#E8A712" stroke-width="1.6" fill="none" stroke-linecap="round" />
+          </g>
+
+          
+          <g class="head" >
+            
+            <path d="M 92 106 L 92 132 C 92 139 108 139 108 132 L 108 106 Z" fill="#BC8148" />
+            <path d="M 92 112 C 96 116 104 116 108 112 L 108 106 L 92 106 Z" fill="#A96F3C" opacity="0.6" />
+
+            
+            <path
+              d="M 58 86 C 56 40 82 24 100 24 C 118 24 144 40 142 86 C 142 102 134 114 125 118 C 134 97 132 62 100 60 C 68 62 66 97 75 118 C 66 114 58 102 58 86 Z"
+              fill="url(#pallu)"
+            />
+            <path
+              d="M 62 80 C 62 42 84 28 100 28 C 116 28 138 42 138 80 L 134.5 82 C 133 50 116 34 100 34 C 84 34 67 50 65.5 82 Z"
+              fill="url(#border)"
+              opacity="0.85"
+            />
+
+            
+            <ellipse cx="70" cy="88" rx="4.2" ry="6.5" fill="#BC8148" />
+            <ellipse cx="130" cy="88" rx="4.2" ry="6.5" fill="#BC8148" />
+            <g fill="#F4C430">
+              <circle cx="70" cy="92" r="1.6" />
+              <path d="M 67.6 94 C 67.6 97.6 72.4 97.6 72.4 94 L 71.8 99 C 71.2 100.4 68.8 100.4 68.2 99 Z" />
+              <circle cx="68.6" cy="101" r="0.8" />
+              <circle cx="70" cy="101.6" r="0.8" />
+              <circle cx="71.4" cy="101" r="0.8" />
+              <circle cx="130" cy="92" r="1.6" />
+              <path d="M 127.6 94 C 127.6 97.6 132.4 97.6 132.4 94 L 131.8 99 C 131.2 100.4 128.8 100.4 128.2 99 Z" />
+              <circle cx="128.6" cy="101" r="0.8" />
+              <circle cx="130" cy="101.6" r="0.8" />
+              <circle cx="131.4" cy="101" r="0.8" />
+            </g>
+
+            
+            <path
+              d="M 71 78 C 71 55 84 45 100 45 C 116 45 129 55 129 78 C 129 96 122 110 112 116.5 C 107.5 119.5 103.5 121 100 121 C 96.5 121 92.5 119.5 88 116.5 C 78 110 71 96 71 78 Z"
+              fill="url(#skin)"
+            />
+
+            
+            <path
+              d="M 100 43 C 81 43 69 56 69 79 C 69 85 70 89.5 71.5 92.5 C 72.5 79 76.5 68.5 85 62.5 C 92 57.7 97.5 56.5 100 56.5 C 102.5 56.5 108 57.7 115 62.5 C 123.5 68.5 127.5 79 128.5 92.5 C 130 89.5 131 85 131 79 C 131 56 119 43 100 43 Z"
+              fill="url(#hairGrad)"
+            />
+            
+            <path d="M 78 62 C 82 57 88 54.5 93 54" stroke="#5C4630" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.8" />
+            <path d="M 122 62 C 118 57 112 54.5 107 54" stroke="#5C4630" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.8" />
+            
+            <path d="M 100 44 L 100 56.5" stroke="#8A6B4A" stroke-width="0.9" opacity="0.7" />
+            <line x1="100" y1="49" x2="100" y2="60" stroke="#F4C430" stroke-width="1" />
+            <circle cx="100" cy="62" r="2" fill="#F4C430" />
+            <circle cx="100" cy="62" r="0.8" fill="#B4232E" />
+
+            
+            <circle cx="100" cy="71.5" r="2.4" fill="#B4232E" />
+
+            
+            <path
+              d="M 78.5 77.5 C 82 73.6 88.5 73 92.8 75.4 C 93.5 76.1 93 77.2 92 77 C 88 76.2 83.5 76.8 80 79 C 78.9 79.5 77.9 78.4 78.5 77.5 Z"
+              fill="#2B1B12"
+            />
+            <path
+              d="M 121.5 77.5 C 118 73.6 111.5 73 107.2 75.4 C 106.5 76.1 107 77.2 108 77 C 112 76.2 116.5 76.8 120 79 C 121.1 79.5 122.1 78.4 121.5 77.5 Z"
+              fill="#2B1B12"
+            />
+
+            
+            <g class="js-blink">
+              
+              <path d="M 80 85 C 82.5 81.4 86.5 80.2 89.5 81.2 C 92 82 93.6 83.6 94.2 85 C 92.8 87.8 89.8 89.4 86.8 89.2 C 84 89 81.5 87.4 80 85 Z" fill="#FFF9F2" />
+              <circle cx="87.3" cy="84.8" r="2.9" fill="#5D3A1A" />
+              <circle cx="87.3" cy="84.8" r="1.5" fill="#241209" />
+              <circle cx="88.2" cy="83.8" r="0.7" fill="#FFFFFF" />
+              
+              <path d="M 79.4 84.6 C 82 80.8 87 79.4 90.4 80.8 C 92.6 81.7 94 83.3 94.6 84.8" stroke="#1D120B" stroke-width="1.5" fill="none" stroke-linecap="round" />
+              <path d="M 79.4 84.6 L 77.2 83.4" stroke="#1D120B" stroke-width="1.3" stroke-linecap="round" />
+              <path d="M 80.5 86.8 C 83 88.8 88 89.6 91.5 88.2" stroke="#3A2415" stroke-width="0.9" fill="none" stroke-linecap="round" opacity="0.85" />
+              
+              <path d="M 81.5 80.2 C 84.5 78.2 89 77.9 92 79.3" stroke="#A97B4B" stroke-width="0.8" fill="none" stroke-linecap="round" opacity="0.7" />
+
+              
+              <path d="M 120 85 C 117.5 81.4 113.5 80.2 110.5 81.2 C 108 82 106.4 83.6 105.8 85 C 107.2 87.8 110.2 89.4 113.2 89.2 C 116 89 118.5 87.4 120 85 Z" fill="#FFF9F2" />
+              <circle cx="112.7" cy="84.8" r="2.9" fill="#5D3A1A" />
+              <circle cx="112.7" cy="84.8" r="1.5" fill="#241209" />
+              <circle cx="113.6" cy="83.8" r="0.7" fill="#FFFFFF" />
+              <path d="M 120.6 84.6 C 118 80.8 113 79.4 109.6 80.8 C 107.4 81.7 106 83.3 105.4 84.8" stroke="#1D120B" stroke-width="1.5" fill="none" stroke-linecap="round" />
+              <path d="M 120.6 84.6 L 122.8 83.4" stroke="#1D120B" stroke-width="1.3" stroke-linecap="round" />
+              <path d="M 119.5 86.8 C 117 88.8 112 89.6 108.5 88.2" stroke="#3A2415" stroke-width="0.9" fill="none" stroke-linecap="round" opacity="0.85" />
+              <path d="M 118.5 80.2 C 115.5 78.2 111 77.9 108 79.3" stroke="#A97B4B" stroke-width="0.8" fill="none" stroke-linecap="round" opacity="0.7" />
+            </g>
+
+            
+            <path d="M 99.2 83 C 100.2 87 100.6 90.4 99.4 93.2" stroke="#A9713A" stroke-width="1.2" fill="none" stroke-linecap="round" />
+            <path d="M 96.6 94.6 C 97.8 95.7 99 96 100.2 95.9" stroke="#A9713A" stroke-width="1" fill="none" stroke-linecap="round" />
+            <path d="M 103.4 94.8 C 102.7 95.4 102 95.7 101.2 95.9" stroke="#A9713A" stroke-width="0.9" fill="none" stroke-linecap="round" opacity="0.8" />
+            <circle cx="95.8" cy="93.4" r="1.1" fill="#F4C430" />
+            <circle cx="95.5" cy="93.1" r="0.4" fill="#FFF3C4" />
+
+            
+            <ellipse cx="81" cy="96" rx="5.5" ry="3" fill="#E08A5F" opacity="0.32" />
+            <ellipse cx="119" cy="96" rx="5.5" ry="3" fill="#E08A5F" opacity="0.32" />
+
+            
+            <g class="smile">
+              <path
+                d="M 90.5 102 C 93.5 100 96.5 99.4 98.6 100.3 C 99.2 100.6 100.8 100.6 101.4 100.3 C 103.5 99.4 106.5 100 109.5 102 C 107 103 104 103.4 100 103.4 C 96 103.4 93 103 90.5 102 Z"
+                fill="url(#lipGrad)"
+              />
+              <path d="M 92 103.6 C 95 106.2 105 106.2 108 103.6 C 105.5 105.8 103 106.8 100 106.8 C 97 106.8 94.5 105.8 92 103.6 Z" fill="#A34A40" />
+              <path d="M 90.5 102 C 94 103.6 106 103.6 109.5 102" stroke="#6E2B24" stroke-width="0.8" fill="none" stroke-linecap="round" />
+            </g>
+            
+            <g class="mouth" >
+              <ellipse class="mouth-shape" cx="100" cy="103" rx="5.5" ry="2" fill="#5C1F1B" />
+              <path d="M 95 101.2 C 98 100 102 100 105 101.2" stroke="#93392F" stroke-width="1.4" fill="none" stroke-linecap="round" />
+            </g>
+
+            
+            <path d="M 97 112.5 C 99 113.8 101 113.8 103 112.5" stroke="#A9713A" stroke-width="0.8" fill="none" stroke-linecap="round" opacity="0.5" />
+          </g>
+        </g>
+      </svg>
