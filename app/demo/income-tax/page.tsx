@@ -1,14 +1,23 @@
 "use client";
+import { LanguageToggle, useUiLanguage } from "@/lib/ui-language";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Avatar, { AvatarState } from "@/components/Avatar";
-import { loadProfile, Profile, profileFromLocationHash, saveProfile } from "@/lib/profile";
+import {
+  loadProfile,
+  Profile,
+  profileFromLocationHash,
+  saveProfile,
+} from "@/lib/profile";
 import { cancelSpeech, isSpeaking, speak, ttsLevel } from "@/lib/tts";
 
 /* ---------------- speech recognition (voice commands) ---------------- */
 
 interface RecognitionResultEvent {
-  results: { [i: number]: { [j: number]: { transcript: string } }; length: number };
+  results: {
+    [i: number]: { [j: number]: { transcript: string } };
+    length: number;
+  };
   resultIndex: number;
 }
 interface RecognitionLike {
@@ -46,44 +55,83 @@ interface FieldDef {
 
 const FIELDS: FieldDef[] = [
   {
-    key: "name", label: "Full Name (as per PAN)", hindi: "पूरा नाम", placeholder: "Enter full name", kind: "input",
+    key: "name",
+    label: "Full Name (as per PAN)",
+    hindi: "पूरा नाम",
+    placeholder: "Enter full name",
+    kind: "input",
     fromProfile: (p) => p.fullName,
-    sayGuide: "सबसे पहले अपना पूरा नाम लिखिए — बिल्कुल वैसा जैसा PAN कार्ड पर छपा है।",
+    sayGuide:
+      "सबसे पहले अपना पूरा नाम लिखिए — बिल्कुल वैसा जैसा PAN कार्ड पर छपा है।",
     sayAuto: "मैं आपका नाम भर रही हूँ",
   },
   {
-    key: "pan", label: "PAN Number", hindi: "पैन नंबर", placeholder: "ABCDE1234F", kind: "input",
+    key: "pan",
+    label: "PAN Number",
+    hindi: "पैन नंबर",
+    placeholder: "ABCDE1234F",
+    kind: "input",
     fromProfile: (p) => p.pan,
     sayGuide: "अब PAN नंबर — दस अक्षरों का, जैसे A B C D E एक दो तीन चार F।",
     sayAuto: "अब PAN नंबर भर रही हूँ",
   },
   {
-    key: "mobile", label: "Mobile Number", hindi: "मोबाइल नंबर", placeholder: "10-digit mobile", kind: "input",
+    key: "mobile",
+    label: "Mobile Number",
+    hindi: "मोबाइल नंबर",
+    placeholder: "10-digit mobile",
+    kind: "input",
     fromProfile: (p) => p.mobile,
     sayGuide: "अपना दस अंकों का मोबाइल नंबर लिखिए — इसी पर OTP आएगा।",
     sayAuto: "मोबाइल नंबर भर रही हूँ",
   },
   {
-    key: "email", label: "Email ID", hindi: "ईमेल", placeholder: "you@example.com", kind: "input",
+    key: "email",
+    label: "Email ID",
+    hindi: "ईमेल",
+    placeholder: "you@example.com",
+    kind: "input",
     fromProfile: (p) => p.email,
     sayGuide: "अब अपनी ईमेल आईडी लिखिए।",
     sayAuto: "ईमेल भर रही हूँ",
   },
   {
-    key: "address", label: "Residential Address", hindi: "पता", placeholder: "House, Village/City, District, State, PIN", kind: "textarea",
+    key: "address",
+    label: "Residential Address",
+    hindi: "पता",
+    placeholder: "House, Village/City, District, State, PIN",
+    kind: "textarea",
     fromProfile: (p) => p.address,
     sayGuide: "अब पूरा पता लिखिए — मकान, गाँव या शहर, ज़िला, राज्य और पिन कोड।",
     sayAuto: "आपका पता भर रही हूँ",
   },
   {
-    key: "gender", label: "Gender", hindi: "लिंग", placeholder: "", kind: "select",
-    fromProfile: (p) => (/^m/i.test(p.gender) ? "Male" : /^f/i.test(p.gender) ? "Female" : p.gender ? "Other" : ""),
+    key: "gender",
+    label: "Gender",
+    hindi: "लिंग",
+    placeholder: "",
+    kind: "select",
+    fromProfile: (p) =>
+      /^m/i.test(p.gender)
+        ? "Male"
+        : /^f/i.test(p.gender)
+          ? "Female"
+          : p.gender
+            ? "Other"
+            : "",
     sayGuide: "अब लिंग चुनिए — Male, Female या Other।",
     sayAuto: "लिंग चुन रही हूँ",
   },
 ];
 
-const EMPTY_VALUES: Record<FieldKey, string> = { name: "", pan: "", mobile: "", email: "", address: "", gender: "" };
+const EMPTY_VALUES: Record<FieldKey, string> = {
+  name: "",
+  pan: "",
+  mobile: "",
+  email: "",
+  address: "",
+  gender: "",
+};
 
 type Mode = "idle" | "guide" | "auto";
 
@@ -97,6 +145,7 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
  * 9876543210", "अगला", "रुको", "auto भरो", "submit"…
  */
 export default function SampleIncomeTaxForm() {
+  const { t, locale } = useUiLanguage();
   const [values, setValues] = useState(EMPTY_VALUES);
   const [submitted, setSubmitted] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -104,7 +153,7 @@ export default function SampleIncomeTaxForm() {
 
   const [mode, setMode] = useState<Mode>("idle");
   const [step, setStep] = useState(-1); // FIELDS.length = submit button
-  const [bubble, setBubble] = useState(
+  const [bubble, setBubble] = useState<string | string[]>(
     "नमस्ते! मैं यहीं बैठी हूँ — screen share की ज़रूरत नहीं। 🧭 Guide दबाइए, मैं हर खाना समझाऊँगी। ⚡ Auto से मैं खुद भर दूँगी।",
   );
   const [talking, setTalking] = useState(false);
@@ -115,7 +164,9 @@ export default function SampleIncomeTaxForm() {
   const modeRef = useRef<Mode>("idle");
   const stepRef = useRef(-1);
   const valuesRef = useRef(EMPTY_VALUES);
-  const fieldRefs = useRef<Partial<Record<FieldKey | "submit", HTMLElement | null>>>({});
+  const fieldRefs = useRef<
+    Partial<Record<FieldKey | "submit", HTMLElement | null>>
+  >({});
   const recRef = useRef<RecognitionLike | null>(null);
   const listeningRef = useRef(false);
 
@@ -137,7 +188,9 @@ export default function SampleIncomeTaxForm() {
         saveProfile(fromLink);
         setProfile(fromLink);
         setImportedFromLink(true);
-        setBubble("✓ Link से आपके details मिल गए! ⚡ Auto दबाइए — मैं फॉर्म खुद भर दूँगी। या 🧭 Guide से साथ-साथ भरते हैं।");
+        setBubble(
+          "✓ Link से आपके details मिल गए! ⚡ Auto दबाइए — मैं फॉर्म खुद भर दूँगी। या 🧭 Guide से साथ-साथ भरते हैं।",
+        );
       } else {
         setProfile(loadProfile());
       }
@@ -155,28 +208,33 @@ export default function SampleIncomeTaxForm() {
     };
   }, []);
 
-  const narrate = useCallback(async (text: string) => {
-    setBubble(text);
-    cancelSpeech();
-    await speak(text);
-  }, []);
+  const narrate = useCallback(
+    async (text: string | string[]) => {
+      setBubble(text);
+      cancelSpeech();
+      await speak((Array.isArray(text) ? text : [text]).map(t).join(" "), {
+        lang: locale === "hi" ? "hi-IN" : "en-IN",
+      });
+    },
+    [t, locale],
+  );
 
   const scrollToStep = (i: number) => {
     const key = i >= FIELDS.length ? "submit" : FIELDS[i].key;
-    fieldRefs.current[key]?.scrollIntoView({ behavior: "smooth", block: "center" });
+    fieldRefs.current[key]?.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
   };
 
-  const stopAgent = useCallback(
-    (say?: string) => {
-      runId.current++;
-      cancelSpeech();
-      setMode("idle");
-      setStep(-1);
-      setBubble(say ?? "ठीक है, रुक गई। जब चाहें 🧭 Guide या ⚡ Auto दबाइए।");
-      if (say) speak(say);
-    },
-    [],
-  );
+  const stopAgent = useCallback((say?: string) => {
+    runId.current++;
+    cancelSpeech();
+    setMode("idle");
+    setStep(-1);
+    setBubble(say ?? "ठीक है, रुक गई। जब चाहें 🧭 Guide या ⚡ Auto दबाइए।");
+    if (say) speak(say);
+  }, []);
 
   /* ---------------- guide mode ---------------- */
 
@@ -194,9 +252,11 @@ export default function SampleIncomeTaxForm() {
       setStep(i);
       scrollToStep(i);
       const suggestion = profile ? f.fromProfile(profile) : "";
-      await narrate(
-        f.sayGuide + (suggestion ? ` आपके profile के अनुसार: ${suggestion}।` : "") + " भरने के बाद मैं खुद अगले खाने पर ले चलूँगी।",
-      );
+      await narrate([
+        f.sayGuide,
+        ...(suggestion ? ["आपकी सहेजी जानकारी:", suggestion] : []),
+        "भरने के बाद अगले खाने पर चलेंगे।",
+      ]);
     },
     [narrate, profile],
   );
@@ -213,7 +273,8 @@ export default function SampleIncomeTaxForm() {
     if (!values[FIELDS[step].key]) return;
     const id = runId.current;
     const t = setTimeout(() => {
-      if (runId.current === id && modeRef.current === "guide") guideStep(step + 1, id);
+      if (runId.current === id && modeRef.current === "guide")
+        guideStep(step + 1, id);
     }, 1600);
     return () => clearTimeout(t);
   }, [values, mode, step, guideStep]);
@@ -244,11 +305,11 @@ export default function SampleIncomeTaxForm() {
       scrollToStep(i);
       const val = f.fromProfile(p);
       if (val) {
-        const saying = narrate(`${f.sayAuto} — ${val}`);
+        const saying = narrate([f.sayAuto, val]);
         await typeInto(f.key, val, id);
         await saying;
       } else {
-        await narrate(`${f.hindi} आपके profile में नहीं है — यह खाना आप भर दीजिए।`);
+        await narrate([f.label, "यह जानकारी सहेजी नहीं है। इसे भर दीजिए।"]);
       }
       await sleep(250);
     }
@@ -264,51 +325,66 @@ export default function SampleIncomeTaxForm() {
   /* ---------------- voice commands ---------------- */
 
   const handleVoice = (raw: string) => {
-      const text = raw.trim();
-      setHeard(text);
-      const t = text.toLowerCase().replace(/\s+/g, " ");
+    const text = raw.trim();
+    setHeard(text);
+    const t = text.toLowerCase().replace(/\s+/g, " ");
 
-      if (/(रुको|रुक जाओ|stop|बंद करो)/.test(t)) return stopAgent("रुक गई।");
-      if (/(auto|अपने आप|खुद भर|आटो)/.test(t)) return void startAuto();
-      if (/(अगला|next|आगे)/.test(t) && modeRef.current === "guide") {
-        return void guideStep(stepRef.current + 1, runId.current);
-      }
-      if (/(submit|जमा|सबमिट)/.test(t)) {
-        setSubmitted(true);
-        setStep(-1);
-        setMode("idle");
-        return void narrate("फॉर्म जमा कर दिया — बधाई हो! 🎉");
-      }
+    if (/(रुको|रुक जाओ|stop|बंद करो)/.test(t)) return stopAgent("रुक गई।");
+    if (/(auto|अपने आप|खुद भर|आटो)/.test(t)) return void startAuto();
+    if (/(अगला|next|आगे)/.test(t) && modeRef.current === "guide") {
+      return void guideStep(stepRef.current + 1, runId.current);
+    }
+    if (/(submit|जमा|सबमिट)/.test(t)) {
+      setSubmitted(true);
+      setStep(-1);
+      setMode("idle");
+      return void narrate("फॉर्म जमा कर दिया — बधाई हो! 🎉");
+    }
 
-      // field corrections
-      const digits = (t.match(/\d/g) ?? []).join("");
-      const set = (key: FieldKey, value: string, confirm: string) => {
-        setValues((v) => ({ ...v, [key]: value }));
-        void narrate(confirm);
-      };
-      const pan = text.toUpperCase().replace(/\s/g, "").match(/[A-Z]{5}\d{4}[A-Z]/)?.[0];
-      if (pan) return set("pan", pan, `PAN बदल दिया: ${pan}`);
-      if (/mobile|मोबाइल|फोन|फ़ोन/.test(t) && digits.length >= 10) {
-        return set("mobile", digits.slice(-10), `मोबाइल बदल दिया: ${digits.slice(-10)}`);
-      }
-      if (/email|ईमेल/.test(t)) {
-        const email = t.match(/\S+@\S+\.\S+/)?.[0];
-        if (email) return set("email", email, `ईमेल बदल दी: ${email}`);
-      }
-      if (/नाम|name/.test(t)) {
-        const m = text.replace(/.*?(?:नाम|name)\s*(?:बदलो|बदल दो|change|to|is|=|:)?\s*/i, "").replace(/(कर दो|करो|लिखो|रखो)\s*$/i, "").trim();
-        if (m.length > 2) return set("name", m, `नाम बदल दिया: ${m}`);
-      }
-      if (/पता|address/.test(t)) {
-        const m = text.replace(/.*?(?:पता|address)\s*(?:बदलो|बदल दो|change|to|is|=|:)?\s*/i, "").trim();
-        if (m.length > 4) return set("address", m, "पता बदल दिया।");
-      }
-      if (/gender|लिंग|महिला|female/.test(t)) {
-        const g = /महिला|female/.test(t) ? "Female" : /पुरुष|male/.test(t) ? "Male" : "";
-        if (g) return set("gender", g, `लिंग: ${g}`);
-      }
+    // field corrections
+    const digits = (t.match(/\d/g) ?? []).join("");
+    const set = (key: FieldKey, value: string) => {
+      setValues((v) => ({ ...v, [key]: value }));
+      void narrate(["जानकारी बदल दी।", value]);
+    };
+    const pan = text
+      .toUpperCase()
+      .replace(/\s/g, "")
+      .match(/[A-Z]{5}\d{4}[A-Z]/)?.[0];
+    if (pan) return set("pan", pan);
+    if (/mobile|मोबाइल|फोन|फ़ोन/.test(t) && digits.length >= 10) {
+      return set("mobile", digits.slice(-10));
+    }
+    if (/email|ईमेल/.test(t)) {
+      const email = t.match(/\S+@\S+\.\S+/)?.[0];
+      if (email) return set("email", email);
+    }
+    if (/नाम|name/.test(t)) {
+      const m = text
+        .replace(/.*?(?:नाम|name)\s*(?:बदलो|बदल दो|change|to|is|=|:)?\s*/i, "")
+        .replace(/(कर दो|करो|लिखो|रखो)\s*$/i, "")
+        .trim();
+      if (m.length > 2) return set("name", m);
+    }
+    if (/पता|address/.test(t)) {
+      const m = text
+        .replace(
+          /.*?(?:पता|address)\s*(?:बदलो|बदल दो|change|to|is|=|:)?\s*/i,
+          "",
+        )
+        .trim();
+      if (m.length > 4) return set("address", m);
+    }
+    if (/gender|लिंग|महिला|female/.test(t)) {
+      const g = /महिला|female/.test(t)
+        ? "Female"
+        : /पुरुष|male/.test(t)
+          ? "Male"
+          : "";
+      if (g) return set("gender", g);
+    }
 
-      setBubble(`मैंने सुना: “${text}” — कहिए: 'auto भरो', 'अगला', 'रुको', 'mobile <नंबर>', 'नाम <नया नाम>', 'submit'।`);
+    setBubble("कहिए: अगला, रुको, नमूना भरो या जमा करो।");
   };
   // recognition callbacks read through a ref so they never go stale
   const handleVoiceRef = useRef(handleVoice);
@@ -330,7 +406,7 @@ export default function SampleIncomeTaxForm() {
       return;
     }
     const rec = new Ctor();
-    rec.lang = "hi-IN";
+    rec.lang = locale === "hi" ? "hi-IN" : "en-IN";
     rec.continuous = true;
     rec.interimResults = false;
     rec.onresult = (e) => {
@@ -351,18 +427,31 @@ export default function SampleIncomeTaxForm() {
     recRef.current = rec;
     listeningRef.current = true;
     setListening(true);
-    setBubble("🎤 सुन रही हूँ… बोलिए: 'auto भरो', 'अगला', 'mobile 98765…', 'नाम बदलो …', 'submit'");
+    setBubble(
+      "🎤 सुन रही हूँ… बोलिए: 'auto भरो', 'अगला', 'mobile 98765…', 'नाम बदलो …', 'submit'",
+    );
     rec.start();
   };
 
   /* ---------------- render helpers ---------------- */
 
-  const setVal = (k: FieldKey) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-    setValues((v) => ({ ...v, [k]: e.target.value }));
+  const setVal =
+    (k: FieldKey) =>
+    (
+      e: React.ChangeEvent<
+        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+      >,
+    ) =>
+      setValues((v) => ({ ...v, [k]: e.target.value }));
 
-  const active = (i: number) => step === i && (mode !== "idle" || i === FIELDS.length);
+  const active = (i: number) =>
+    step === i && (mode !== "idle" || i === FIELDS.length);
   const running = mode !== "idle";
-  const avatarState: AvatarState = talking ? "speaking" : listening ? "listening" : "idle";
+  const avatarState: AvatarState = talking
+    ? "speaking"
+    : listening
+      ? "listening"
+      : "idle";
 
   const fieldWrap = (i: number, f: FieldDef, child: React.ReactNode) => (
     <div
@@ -376,11 +465,11 @@ export default function SampleIncomeTaxForm() {
     >
       {active(i) && (
         <span className="absolute -left-2 -top-3 z-10 animate-bounce rounded-full bg-emerald-600 px-2 py-0.5 text-xs font-bold text-white shadow">
-          👉 यहाँ
+          {t("👉 यहाँ")}
         </span>
       )}
       <label className="mb-1 block text-sm font-semibold">
-        {f.label} / {f.hindi} <span className="text-red-600">*</span>
+        {t(f.label)} <span className="text-red-600">*</span>
       </label>
       {child}
     </div>
@@ -389,37 +478,47 @@ export default function SampleIncomeTaxForm() {
   return (
     <div className="min-h-dvh bg-[#F4F6FA] pb-64 text-stone-800 sm:pb-40">
       <div className="bg-amber-100 px-4 py-2 text-center text-xs font-semibold text-amber-900">
-        🧪 SAMPLE FORM — JanSewak hackathon demo. This is not a real government website. Nothing is saved or submitted
-        anywhere.
+        {t(
+          "🧪 SAMPLE FORM — JanSewak hackathon demo. This is not a real government website. Nothing is saved or submitted anywhere.",
+        )}
       </div>
 
       <header className="border-b-4 border-orange-500 bg-white">
-        <div className="mx-auto flex max-w-3xl items-center gap-4 px-5 py-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0B3B8C] text-2xl">🏛️</div>
+        <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-4 px-5 py-4">
           <div>
-            <p className="text-lg font-bold text-[#0B3B8C]">आयकर विभाग · Income Tax Department</p>
-            <p className="text-xs text-stone-500">e-Filing Sample Portal (Demo) · Government of India (simulated)</p>
+            <p className="text-lg font-bold text-[#0B3B8C]">
+              {t("आयकर विभाग · Income Tax Department")}
+            </p>
           </div>
+          <LanguageToggle />
         </div>
       </header>
 
       <main className="mx-auto max-w-3xl px-5 py-8">
         {importedFromLink && (
           <div className="mb-4 rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-2.5 text-sm font-medium text-emerald-800">
-            🔗 Link से profile import हो गई — agent इन्हीं details से मदद करेगी।
+            {t(
+              "🔗 Link से profile import हो गई — agent इन्हीं details से मदद करेगी।",
+            )}
           </div>
         )}
 
         <div className="rounded-lg border border-stone-300 bg-white shadow-sm">
           <div className="border-b border-stone-200 bg-[#0B3B8C] px-5 py-3 text-white">
-            <h1 className="font-semibold">Taxpayer Basic Details — Form (Sample)</h1>
+            <h1 className="font-semibold">
+              {t("Taxpayer Basic Details — Form (Sample)")}
+            </h1>
           </div>
 
           {submitted ? (
             <div className="m-5 rounded-lg border border-green-300 bg-green-50 p-5 text-center">
-              <p className="text-lg font-bold text-green-800">✓ Form submitted successfully (demo)</p>
+              <p className="text-lg font-bold text-green-800">
+                {t("✓ Form submitted successfully (demo)")}
+              </p>
               <p className="mt-1 text-sm text-green-700">
-                फॉर्म सफलतापूर्वक जमा हुआ। JanSewak की मदद से आपने यह फॉर्म भरा! 🎉
+                {t(
+                  "फॉर्म सफलतापूर्वक जमा हुआ। JanSewak की मदद से आपने यह फॉर्म भरा! 🎉",
+                )}
               </p>
               <button
                 onClick={() => {
@@ -429,7 +528,7 @@ export default function SampleIncomeTaxForm() {
                 }}
                 className="mt-4 rounded-lg border border-green-600 px-4 py-2 text-sm font-medium text-green-800 hover:bg-green-100"
               >
-                Fill again
+                {t("Fill again")}
               </button>
             </div>
           ) : (
@@ -451,7 +550,7 @@ export default function SampleIncomeTaxForm() {
                     <textarea
                       value={values[f.key]}
                       onChange={setVal(f.key)}
-                      placeholder={f.placeholder}
+                      placeholder={t(f.placeholder)}
                       rows={2}
                       className="w-full rounded border border-stone-400 px-3 py-2.5 focus:border-[#0B3B8C] focus:outline-none"
                     />
@@ -461,17 +560,23 @@ export default function SampleIncomeTaxForm() {
                       onChange={setVal(f.key)}
                       className="w-full rounded border border-stone-400 bg-white px-3 py-2.5 focus:border-[#0B3B8C] focus:outline-none"
                     >
-                      <option value="">-- Select --</option>
-                      <option>Male</option>
-                      <option>Female</option>
-                      <option>Other</option>
+                      <option value="">{t("-- Select --")}</option>
+                      <option value="Male">{t("Male")}</option>
+                      <option value="Female">{t("Female")}</option>
+                      <option value="Other">{t("Other")}</option>
                     </select>
                   ) : (
                     <input
                       value={values[f.key]}
                       onChange={setVal(f.key)}
-                      placeholder={f.placeholder}
-                      maxLength={f.key === "pan" ? 10 : f.key === "mobile" ? 10 : undefined}
+                      placeholder={t(f.placeholder)}
+                      maxLength={
+                        f.key === "pan"
+                          ? 10
+                          : f.key === "mobile"
+                            ? 10
+                            : undefined
+                      }
                       className={`w-full rounded border border-stone-400 px-3 py-2.5 focus:border-[#0B3B8C] focus:outline-none ${
                         f.key === "pan" ? "uppercase tracking-widest" : ""
                       }`}
@@ -485,20 +590,27 @@ export default function SampleIncomeTaxForm() {
                   fieldRefs.current.submit = el;
                 }}
                 className={`flex items-center gap-3 rounded-lg border-t border-stone-200 p-2 pt-4 ${
-                  step === FIELDS.length ? "bg-emerald-50 ring-4 ring-emerald-400/80" : ""
+                  step === FIELDS.length
+                    ? "bg-emerald-50 ring-4 ring-emerald-400/80"
+                    : ""
                 }`}
               >
-                <button type="submit" className="rounded bg-[#0B3B8C] px-6 py-2.5 font-semibold text-white hover:bg-[#0A2F6E]">
-                  Submit
+                <button
+                  type="submit"
+                  className="rounded bg-[#0B3B8C] px-6 py-2.5 font-semibold text-white hover:bg-[#0A2F6E]"
+                >
+                  {t("Submit")}
                 </button>
                 <button
                   type="button"
                   onClick={() => setValues(EMPTY_VALUES)}
                   className="rounded border border-stone-400 px-6 py-2.5 font-semibold text-stone-600 hover:bg-stone-50"
                 >
-                  Reset
+                  {t("Reset")}
                 </button>
-                {step === FIELDS.length && <span className="animate-bounce text-lg">👉</span>}
+                {step === FIELDS.length && (
+                  <span className="animate-bounce text-lg">👉</span>
+                )}
               </div>
             </form>
           )}
@@ -510,10 +622,20 @@ export default function SampleIncomeTaxForm() {
         <div className="overflow-hidden rounded-2xl border border-orange-300 bg-[#FFF7EC] shadow-2xl">
           <div className="flex items-center gap-2 bg-gradient-to-r from-orange-100 to-amber-50 px-3 py-1.5">
             <span className="text-sm">🙏</span>
-            <p className="text-xs font-bold text-stone-800">जनसेवक · inbuilt guide</p>
+            <p className="text-xs font-bold text-stone-800">
+              {t("जनसेवक · inbuilt guide")}
+            </p>
             <span className="ml-auto flex items-center gap-1 text-[10px] font-semibold text-emerald-700">
-              <span className={`h-1.5 w-1.5 rounded-full ${running || listening ? "animate-pulse bg-emerald-500" : "bg-stone-300"}`} />
-              {mode === "auto" ? "AUTO" : mode === "guide" ? "GUIDE" : listening ? "सुन रही हूँ" : "READY"}
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${running || listening ? "animate-pulse bg-emerald-500" : "bg-stone-300"}`}
+              />
+              {mode === "auto"
+                ? t("AUTO")
+                : mode === "guide"
+                  ? t("GUIDE")
+                  : listening
+                    ? t("सुन रही हूँ")
+                    : t("READY")}
             </span>
           </div>
 
@@ -522,8 +644,14 @@ export default function SampleIncomeTaxForm() {
               <Avatar state={avatarState} getLevel={ttsLevel} size={96} />
             </div>
             <div className="min-w-0 flex-1 pt-1">
-              <p className="text-[13px] leading-snug text-stone-800">{bubble}</p>
-              {heard && listening && <p className="mt-1 truncate text-[10px] text-stone-400">🎤 “{heard}”</p>}
+              <p className="text-[13px] leading-normal text-stone-800">
+                {(Array.isArray(bubble) ? bubble : [bubble]).map(t).join(" ")}
+              </p>
+              {heard && listening && (
+                <p className="mt-1 truncate text-[10px] text-stone-400">
+                  🎤 “{heard}”
+                </p>
+              )}
             </div>
           </div>
 
@@ -534,39 +662,45 @@ export default function SampleIncomeTaxForm() {
                   onClick={startGuide}
                   className="flex-1 rounded-lg bg-emerald-700 px-2 py-2 text-xs font-semibold text-white hover:bg-emerald-800"
                 >
-                  🧭 Guide करो
+                  {t("🧭 Guide करो")}
                 </button>
                 <button
                   onClick={() => void startAuto()}
                   className="flex-1 rounded-lg bg-[#0B3B8C] px-2 py-2 text-xs font-semibold text-white hover:bg-[#0A2F6E]"
                 >
-                  ⚡ Auto भरो
+                  {t("⚡ Auto भरो")}
                 </button>
               </>
             ) : (
               <>
                 {mode === "guide" && (
                   <button
-                    onClick={() => void guideStep(stepRef.current + 1, runId.current)}
+                    onClick={() =>
+                      void guideStep(stepRef.current + 1, runId.current)
+                    }
                     className="flex-1 rounded-lg bg-emerald-700 px-2 py-2 text-xs font-semibold text-white"
                   >
-                    ⏭ अगला
+                    {t("⏭ अगला")}
                   </button>
                 )}
                 <button
                   onClick={() => stopAgent()}
                   className="flex-1 rounded-lg bg-red-600 px-2 py-2 text-xs font-semibold text-white hover:bg-red-700"
                 >
-                  ⏹ रोकें
+                  {t("⏹ रोकें")}
                 </button>
               </>
             )}
             <button
               onClick={toggleMic}
               className={`rounded-lg px-3 py-2 text-xs font-semibold ${
-                listening ? "bg-red-100 text-red-700 ring-2 ring-red-400" : "border border-stone-300 bg-white text-stone-700"
+                listening
+                  ? "bg-red-100 text-red-700 ring-2 ring-red-400"
+                  : "border border-stone-300 bg-white text-stone-700"
               }`}
-              title="Voice से बदलिए: 'mobile 98765…', 'नाम बदलो…', 'अगला', 'submit'"
+              title={t(
+                "Voice से बदलिए: 'mobile 98765…', 'नाम बदलो…', 'अगला', 'submit'",
+              )}
             >
               {listening ? "🔴" : "🎤"}
             </button>

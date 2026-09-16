@@ -1,4 +1,5 @@
 "use client";
+import { useUiLanguage } from "@/lib/ui-language";
 
 import { useEffect, useRef } from "react";
 import { Highlight } from "@/lib/tools";
@@ -10,6 +11,7 @@ interface ScreenFeedProps {
 
 /** Live screen-share preview with the agent's highlight box drawn on top. */
 export default function ScreenFeed({ stream, highlight }: ScreenFeedProps) {
+  const { t } = useUiLanguage();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const raf = useRef(0);
@@ -54,7 +56,8 @@ export default function ScreenFeed({ stream, highlight }: ScreenFeedProps) {
         if (ctx) {
           const h = highlightRef.current;
           const active = !!h && performance.now() - h.at < 20000;
-          if (active || wasDrawing) ctx.clearRect(0, 0, canvas.width, canvas.height);
+          if (active || wasDrawing)
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
           wasDrawing = active;
           // Highlights fade out after 20s so stale boxes don't mislead.
           if (h && active) {
@@ -62,7 +65,8 @@ export default function ScreenFeed({ stream, highlight }: ScreenFeedProps) {
             const y = (h.ymin / 1000) * canvas.height;
             const w = ((h.xmax - h.xmin) / 1000) * canvas.width;
             const hh = ((h.ymax - h.ymin) / 1000) * canvas.height;
-            const pulse = 0.55 + 0.45 * Math.abs(Math.sin(performance.now() / 400));
+            const pulse =
+              0.55 + 0.45 * Math.abs(Math.sin(performance.now() / 400));
 
             // yellow marker style — border + highlighter fill
             ctx.strokeStyle = `rgba(234, 179, 8, ${pulse})`;
@@ -94,10 +98,13 @@ export default function ScreenFeed({ stream, highlight }: ScreenFeedProps) {
   return (
     <div className="relative overflow-hidden rounded-lg border border-stone-300 bg-stone-900">
       <video ref={videoRef} muted playsInline className="block w-full" />
-      <canvas ref={canvasRef} className="pointer-events-none absolute inset-0" />
+      <canvas
+        ref={canvasRef}
+        className="pointer-events-none absolute inset-0"
+      />
       {!stream && (
         <div className="flex aspect-video items-center justify-center text-sm text-stone-400">
-          Screen share बंद है · not sharing
+          {t("Screen share बंद है · not sharing")}
         </div>
       )}
     </div>

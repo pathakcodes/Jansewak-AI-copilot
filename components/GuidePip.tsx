@@ -1,4 +1,5 @@
 "use client";
+import { useUiLanguage } from "@/lib/ui-language";
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
@@ -26,7 +27,9 @@ function profileChips(): CopyTextItem[] {
     ["उम्र · Age", p.age],
     ["लिंग · Gender", p.gender],
   ];
-  return rows.filter(([, v]) => v).map(([fieldHint, text], i) => ({ id: `profile-${i}`, fieldHint, text }));
+  return rows
+    .filter(([, v]) => v)
+    .map(([fieldHint, text], i) => ({ id: `profile-${i}`, fieldHint, text }));
 }
 
 export interface GuideState {
@@ -51,28 +54,53 @@ interface GuidePanelProps {
 }
 
 /** The guide UI itself — rendered either inside the PiP window or as a floating panel. */
-export function GuidePanel({ guide, avatarState, getLevel, transcript, onToggleMic, onEndGuide, onToggleFileTool, onCopied }: GuidePanelProps) {
-  const lastUser = [...transcript].reverse().find((e) => e.role === "user" && !e.hidden && e.text.trim());
-  const lastAgent = [...transcript].reverse().find((e) => e.role === "agent" && !e.hidden && e.text.trim());
+export function GuidePanel({
+  guide,
+  avatarState,
+  getLevel,
+  transcript,
+  onToggleMic,
+  onEndGuide,
+  onToggleFileTool,
+  onCopied,
+}: GuidePanelProps) {
+  const { t } = useUiLanguage();
+  const lastUser = [...transcript]
+    .reverse()
+    .find((e) => e.role === "user" && !e.hidden && e.text.trim());
+  const lastAgent = [...transcript]
+    .reverse()
+    .find((e) => e.role === "agent" && !e.hidden && e.text.trim());
 
   return (
     <div className="relative h-full bg-[#FFF7EC]">
-      <div className="flex h-full flex-col gap-2.5 overflow-y-auto p-3" style={{ minHeight: 0 }}>
+      <div
+        className="flex h-full flex-col gap-2.5 overflow-y-auto p-3"
+        style={{ minHeight: 0 }}
+      >
         <div className="flex items-center gap-2">
           <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-b from-orange-500 via-white to-green-600 text-sm">
             🙏
           </span>
-          <p className="text-sm font-bold text-stone-800">जनसेवक Guide</p>
+          <p className="text-sm font-bold text-stone-800">
+            {t("जनसेवक Guide")}
+          </p>
           <span className="ml-auto flex items-center gap-1 text-[11px] font-medium text-emerald-700">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" /> LIVE
+            <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
+            {t("LIVE")}
           </span>
         </div>
 
         {/* next step */}
         <div className="rounded-lg border border-orange-200 bg-white px-2.5 py-2">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-orange-700">अगला कदम · Next step</p>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-orange-700">
+            {t("अगला कदम · Next step")}
+          </p>
           <p className="text-sm leading-snug text-stone-800">
-            {guide.instruction || "बोलिए, मैं आपकी स्क्रीन देखकर मदद करूँगी… (speak — I can see your screen)"}
+            {guide.instruction ||
+              t(
+                "बोलिए, मैं आपकी स्क्रीन देखकर मदद करूँगी… (speak — I can see your screen)",
+              )}
           </p>
         </div>
 
@@ -93,11 +121,14 @@ export function GuidePanel({ guide, avatarState, getLevel, transcript, onToggleM
         {/* full profile — tucked away until needed */}
         <details className="rounded-lg border border-stone-200 bg-white/70 p-2">
           <summary className="cursor-pointer select-none text-xs font-semibold text-stone-600">
-            👤 सारी जानकारी दिखाएँ · all my details
+            {t("👤 सारी जानकारी दिखाएँ · all my details")}
           </summary>
           <div className="mt-1.5 grid grid-cols-2 gap-1.5">
             {profileChips().map((c) => (
-              <div key={c.id} className={c.text.length > 18 ? "col-span-2" : ""}>
+              <div
+                key={c.id}
+                className={c.text.length > 18 ? "col-span-2" : ""}
+              >
                 <CopyText item={c} onCopied={onCopied} />
               </div>
             ))}
@@ -111,14 +142,23 @@ export function GuidePanel({ guide, avatarState, getLevel, transcript, onToggleM
         <div className="mt-auto space-y-1 pr-[130px]">
           {lastUser && (
             <div className="w-fit max-w-full rounded-xl rounded-bl-sm bg-emerald-100 px-2.5 py-1.5">
-              <p className="text-[10px] font-bold uppercase text-emerald-700">🧑 आप · You</p>
-              <p className="text-xs leading-snug text-emerald-950">{lastUser.text}</p>
+              <p className="text-[10px] font-bold uppercase text-emerald-700">
+                {t("🧑 आप · You")}
+              </p>
+              <p className="text-xs leading-snug text-emerald-950">
+                {lastUser.text}
+              </p>
             </div>
           )}
           {lastAgent && (
             <div className="w-fit max-w-full rounded-xl rounded-bl-sm border border-orange-200 bg-white px-2.5 py-1.5">
-              <p className="text-[10px] font-bold uppercase text-orange-700">🙏 जनसेवक{avatarState === "speaking" ? " · बोल रही हूँ…" : ""}</p>
-              <p className="text-xs leading-snug text-stone-800">{lastAgent.text}</p>
+              <p className="text-[10px] font-bold uppercase text-orange-700">
+                {t("🙏 जनसेवक")}
+                {avatarState === "speaking" ? t(" · बोल रही हूँ…") : ""}
+              </p>
+              <p className="text-xs leading-snug text-stone-800">
+                {lastAgent.text}
+              </p>
             </div>
           )}
         </div>
@@ -127,15 +167,17 @@ export function GuidePanel({ guide, avatarState, getLevel, transcript, onToggleM
           <button
             onClick={onToggleMic}
             className={`flex-1 rounded-lg px-3 py-2 text-sm font-medium ${
-              guide.micMuted ? "bg-stone-200 text-stone-700" : "bg-emerald-700 text-white"
+              guide.micMuted
+                ? "bg-stone-200 text-stone-700"
+                : "bg-emerald-700 text-white"
             }`}
           >
-            {guide.micMuted ? "🔇 Mic off" : "🎙️ Mic on"}
+            {guide.micMuted ? t("🔇 Mic off") : t("🎙️ Mic on")}
           </button>
           <button
             onClick={onToggleFileTool}
             className="rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700"
-            title="Photo/file resize tool"
+            title={t("Photo/file resize tool")}
           >
             📁
           </button>
@@ -143,7 +185,7 @@ export function GuidePanel({ guide, avatarState, getLevel, transcript, onToggleM
             onClick={onEndGuide}
             className="rounded-lg bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700"
           >
-            ✕ End
+            {t("✕ End")}
           </button>
         </div>
       </div>
@@ -157,7 +199,13 @@ export function GuidePanel({ guide, avatarState, getLevel, transcript, onToggleM
 }
 
 /** Renders children into a Document-PiP window via a React portal. */
-export function PipPortal({ pipWindow, children }: { pipWindow: Window; children: React.ReactNode }) {
+export function PipPortal({
+  pipWindow,
+  children,
+}: {
+  pipWindow: Window;
+  children: React.ReactNode;
+}) {
   const [container] = useState(() => {
     const el = pipWindow.document.createElement("div");
     el.style.height = "100vh";
