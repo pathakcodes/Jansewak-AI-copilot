@@ -8,11 +8,18 @@
 
 let cachedVoice: SpeechSynthesisVoice | null = null;
 
-function pickVoice(): SpeechSynthesisVoice | null {
+function pickVoice(lang = "hi-IN"): SpeechSynthesisVoice | null {
   if (typeof window === "undefined" || !window.speechSynthesis) return null;
-  if (cachedVoice) return cachedVoice;
+  if (cachedVoice?.lang === lang) return cachedVoice;
   const voices = window.speechSynthesis.getVoices();
-  const female = /female|woman|lekha|veena|swara|kalpana|heera|priya|neerja|kajal/i;
+  if (lang.startsWith("en"))
+    return (
+      voices.find((v) => v.lang === lang) ??
+      voices.find((v) => v.lang.startsWith("en")) ??
+      null
+    );
+  const female =
+    /female|woman|lekha|veena|swara|kalpana|heera|priya|neerja|kajal/i;
   const male = /male|man\b|rishi|hemant|madhur|prabhat/i;
   const byPref =
     voices.find((v) => v.lang === "hi-IN" && female.test(v.name)) ??
@@ -37,7 +44,10 @@ export function isTtsSupported(): boolean {
 
 /** Speak `text` aloud; resolves when finished (or cancelled). Never hangs:
  *  if no voice actually starts (headless/unsupported), resolves quickly. */
-export function speak(text: string, opts?: { rate?: number; pitch?: number }): Promise<void> {
+export function speak(
+  text: string,
+  opts?: { rate?: number; pitch?: number; lang?: string },
+): Promise<void> {
   return new Promise((resolve) => {
     if (!isTtsSupported() || !text.trim()) return resolve();
     let done = false;
@@ -48,9 +58,9 @@ export function speak(text: string, opts?: { rate?: number; pitch?: number }): P
       }
     };
     const u = new SpeechSynthesisUtterance(text);
-    const voice = pickVoice();
+    const voice = pickVoice(opts?.lang);
     if (voice) u.voice = voice;
-    u.lang = voice?.lang ?? "hi-IN";
+    u.lang = voice?.lang ?? opts?.lang ?? "hi-IN";
     u.rate = opts?.rate ?? 1;
     u.pitch = opts?.pitch ?? 1.05;
     u.onend = finish;
@@ -60,7 +70,8 @@ export function speak(text: string, opts?: { rate?: number; pitch?: number }): P
     window.speechSynthesis.speak(u);
     // safety nets: no voice ever starts, or onend is silently dropped
     setTimeout(() => {
-      if (!window.speechSynthesis.speaking && !window.speechSynthesis.pending) finish();
+      if (!window.speechSynthesis.speaking && !window.speechSynthesis.pending)
+        finish();
     }, 1200);
     setTimeout(finish, Math.min(20000, 2500 + text.length * 120));
   });

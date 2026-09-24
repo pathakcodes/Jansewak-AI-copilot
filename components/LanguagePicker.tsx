@@ -1,4 +1,5 @@
 "use client";
+import { useUiLanguage } from "@/lib/ui-language";
 
 export const LANGUAGES = [
   { code: "Hindi", label: "हिन्दी" },
@@ -21,20 +22,25 @@ interface LanguagePickerProps {
   disabled?: boolean;
 }
 
-export default function LanguagePicker({ value, onChange, disabled }: LanguagePickerProps) {
+export default function LanguagePicker({
+  value,
+  onChange,
+  disabled,
+}: LanguagePickerProps) {
+  const { locale } = useUiLanguage();
   return (
     <label className="flex items-center gap-2 text-sm text-stone-600">
-      <span aria-hidden>🗣️</span>
+      <span>{locale === "hi" ? "बोलने की भाषा" : "Voice"}</span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
         className="rounded-lg border border-stone-300 bg-white px-2 py-1.5 text-sm text-stone-800 disabled:opacity-60"
-        aria-label="Choose language"
+        aria-label={locale === "hi" ? "बोलने की भाषा" : "Spoken language"}
       >
         {LANGUAGES.map((l) => (
           <option key={l.code} value={l.code}>
-            {l.label} · {l.code}
+            {l.label}
           </option>
         ))}
       </select>

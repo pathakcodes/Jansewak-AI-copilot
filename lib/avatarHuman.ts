@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
+import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 
 import type { AvatarState } from "@/components/Avatar";
 
@@ -238,6 +239,7 @@ export function createAvatarScene(
   width: number,
   height: number,
   onReady?: () => void,
+  framing: "close" | "portrait" = "close",
 ): AvatarSceneHandle {
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
   renderer.setPixelRatio(Math.min((canvas.ownerDocument.defaultView ?? window).devicePixelRatio || 1, 2));
@@ -268,7 +270,7 @@ export function createAvatarScene(
   let baseEyeLQ: THREE.Quaternion | null = null;
   let baseEyeRQ: THREE.Quaternion | null = null;
 
-  new GLTFLoader().load("/avatar-lady.glb", (gltf) => {
+  new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).load("/avatar-lady-optimized.glb", (gltf) => {
     if (disposed) return;
     const model = gltf.scene;
     scene.add(model);
@@ -340,8 +342,9 @@ export function createAvatarScene(
 
     // framing: head-and-shoulders with enough chest to show the pallu —
     // her face still fills the frame in small tiles
-    camera.position.set(0, headPos.y - 0.105, headPos.z + 1.18);
-    camera.lookAt(headPos.x, headPos.y - 0.125, headPos.z);
+    const portrait = framing === "portrait";
+    camera.position.set(0, headPos.y - (portrait ? 0.18 : 0.105), headPos.z + (portrait ? 1.48 : 1.18));
+    camera.lookAt(headPos.x, headPos.y - (portrait ? 0.20 : 0.125), headPos.z);
 
     ready = true;
     onReady?.();

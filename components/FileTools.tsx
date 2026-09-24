@@ -1,4 +1,5 @@
 "use client";
+import { useUiLanguage } from "@/lib/ui-language";
 
 import { useRef, useState } from "react";
 import { FileToolConfig } from "@/lib/tools";
@@ -23,7 +24,11 @@ async function loadImage(file: File): Promise<HTMLImageElement> {
  * Compress an image under a KB target: binary-search JPEG quality, and if
  * even the lowest quality is too big, scale dimensions down and retry.
  */
-async function compressToTarget(file: File, targetKb: number, format: string): Promise<Blob> {
+async function compressToTarget(
+  file: File,
+  targetKb: number,
+  format: string,
+): Promise<Blob> {
   const img = await loadImage(file);
   const mime = format === "png" ? "image/png" : "image/jpeg";
   let scale = 1;
@@ -37,7 +42,8 @@ async function compressToTarget(file: File, targetKb: number, format: string): P
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-    const toBlob = (q: number) => new Promise<Blob>((res) => canvas.toBlob((b) => res(b!), mime, q));
+    const toBlob = (q: number) =>
+      new Promise<Blob>((res) => canvas.toBlob((b) => res(b!), mime, q));
 
     let lo = 0.05,
       hi = 0.95,
@@ -59,10 +65,16 @@ async function compressToTarget(file: File, targetKb: number, format: string): P
 }
 
 export default function FileTools({ config }: { config: FileToolConfig }) {
+  const { t } = useUiLanguage();
   const [targetKb, setTargetKb] = useState(config.targetKb ?? 50);
   const [format, setFormat] = useState(config.format ?? "jpeg");
   const [busy, setBusy] = useState(false);
-  const [result, setResult] = useState<{ url: string; sizeKb: number; name: string; originalKb: number } | null>(null);
+  const [result, setResult] = useState<{
+    url: string;
+    sizeKb: number;
+    name: string;
+    originalKb: number;
+  } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -88,7 +100,9 @@ export default function FileTools({ config }: { config: FileToolConfig }) {
 
   return (
     <div className="space-y-3 rounded-xl border border-stone-200 bg-white p-3">
-      <p className="text-sm font-semibold text-stone-800">📁 फोटो/फ़ाइल टूल · File helper</p>
+      <p className="text-sm font-semibold text-stone-800">
+        {t("📁 फोटो/फ़ाइल टूल · File helper")}
+      </p>
 
       <div className="flex flex-wrap gap-1.5">
         {PRESETS.map((p) => (
@@ -99,17 +113,19 @@ export default function FileTools({ config }: { config: FileToolConfig }) {
               setFormat(p.format);
             }}
             className={`rounded-full border px-2.5 py-1 text-xs ${
-              targetKb === p.kb ? "border-emerald-600 bg-emerald-50 text-emerald-800" : "border-stone-300 text-stone-600"
+              targetKb === p.kb
+                ? "border-emerald-600 bg-emerald-50 text-emerald-800"
+                : "border-stone-300 text-stone-600"
             }`}
           >
-            {p.label}
+            {t(p.label)}
           </button>
         ))}
       </div>
 
       <div className="flex items-center gap-2 text-sm">
         <label className="flex items-center gap-1 text-stone-600">
-          Max
+          {t("Max")}
           <input
             type="number"
             min={5}
@@ -132,7 +148,7 @@ export default function FileTools({ config }: { config: FileToolConfig }) {
           disabled={busy}
           className="ml-auto rounded-lg bg-emerald-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-800 disabled:opacity-50"
         >
-          {busy ? "Processing…" : "Choose file"}
+          {busy ? t("Processing…") : t("Choose file")}
         </button>
         <input
           ref={inputRef}
@@ -143,7 +159,7 @@ export default function FileTools({ config }: { config: FileToolConfig }) {
         />
       </div>
 
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      {error && <p className="text-xs text-red-600">{t(error)}</p>}
       {result && (
         <div className="flex items-center gap-2 rounded-lg bg-emerald-50 p-2 text-sm">
           <span className="text-emerald-800">
@@ -154,7 +170,7 @@ export default function FileTools({ config }: { config: FileToolConfig }) {
             download={result.name}
             className="ml-auto rounded-lg border border-emerald-600 px-3 py-1 font-medium text-emerald-800 hover:bg-emerald-100"
           >
-            ⬇ Download
+            {t("⬇ Download")}
           </a>
         </div>
       )}

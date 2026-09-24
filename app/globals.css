@@ -12,9 +12,49 @@
 }
 
 body {
+  line-height: 1.5;
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-body), "Noto Sans Devanagari", system-ui, sans-serif;
+  font-family: var(--font-interface), var(--font-body), system-ui, sans-serif;
+}
+
+.ui-language {
+  display: inline-flex;
+  flex-shrink: 0;
+  border: 1px solid #c9c0d2;
+  border-radius: 5px;
+  padding: 3px;
+  gap: 2px;
+}
+.ui-language button {
+  min-height: 38px;
+  padding: 6px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 3px;
+  color: #65606a;
+}
+.ui-language button[aria-pressed="true"] {
+  background: #543783;
+  color: white;
+}
+.ui-language button:focus-visible {
+  outline: 2px solid #543783;
+  outline-offset: 3px;
+}
+.home[lang="en"] h1 {
+  font-family: var(--font-interface), sans-serif;
+  line-height: 1.08;
+}
+.home[lang="en"] h2,
+.home[lang="en"] .home-brand {
+  font-family: var(--font-interface), sans-serif;
+}
+.home-demo-copy .home-text-link {
+  margin-top: 20px;
+}
+.home-how {
+  border-top: 1px solid var(--line);
 }
 
 /* Avatar idle animations */

@@ -1,4 +1,5 @@
 "use client";
+import { LanguageToggle, useUiLanguage } from "@/lib/ui-language";
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -16,26 +17,39 @@ function suggestionsFor(text: string): CopyTextItem[] {
   const p = loadProfile();
   const t = text.toLowerCase();
   const out: CopyTextItem[] = [];
-  const add = (id: string, fieldHint: string, value: string) => value && out.push({ id, fieldHint, text: value });
+  const add = (id: string, fieldHint: string, value: string) =>
+    value && out.push({ id, fieldHint, text: value });
   if (/aadha?r|aadhar|आधार/.test(t)) {
     add("auto-aadhaar", "आधार · Aadhaar", p.aadhaar || "");
   } else if (/name|नाम|naam/.test(t)) {
     add("auto-name-en", "Name (English)", p.fullName);
     add("auto-name-native", "नाम (हिन्दी)", p.nameNative);
   } else if (/\bpan\b|पैन/.test(t)) add("auto-pan", "PAN", p.pan);
-  else if (/mobile|मोबाइल|phone|फ़ोन|फोन|संपर्क/.test(t)) add("auto-mobile", "Mobile", p.mobile);
+  else if (/mobile|मोबाइल|phone|फ़ोन|फोन|संपर्क/.test(t))
+    add("auto-mobile", "Mobile", p.mobile);
   else if (/email|ईमेल|मेल/.test(t)) add("auto-email", "Email", p.email);
-  else if (/address|पता|ठिकाना/.test(t)) add("auto-address", "पता · Address", p.address);
+  else if (/address|पता|ठिकाना/.test(t))
+    add("auto-address", "पता · Address", p.address);
   else if (/\bage\b|उम्र|आयु/.test(t)) add("auto-age", "Age", p.age);
   else if (/gender|लिंग/.test(t)) add("auto-gender", "Gender", p.gender);
   return out;
 }
-import { JanSewakLive, SessionStatus, TranscriptEntry } from "@/lib/live-client";
+import {
+  JanSewakLive,
+  SessionStatus,
+  TranscriptEntry,
+} from "@/lib/live-client";
 import { ScreenShare } from "@/lib/screen";
 import { isDocumentPipSupported, openPipWindow } from "@/lib/pip";
-import { CopyTextItem, FileToolConfig, Highlight, SuggestedAction } from "@/lib/tools";
+import {
+  CopyTextItem,
+  FileToolConfig,
+  Highlight,
+  SuggestedAction,
+} from "@/lib/tools";
 
 export default function AssistantPage() {
+  const { t, locale } = useUiLanguage();
   const [status, setStatus] = useState<SessionStatus>("idle");
   const [statusDetail, setStatusDetail] = useState<string | undefined>();
   const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
@@ -43,8 +57,11 @@ export default function AssistantPage() {
   const [copyTexts, setCopyTexts] = useState<CopyTextItem[]>([]);
   const [highlight, setHighlight] = useState<Highlight | null>(null);
   const [instruction, setInstruction] = useState("");
-  const [fileToolConfig, setFileToolConfig] = useState<FileToolConfig | null>(null);
-  const [language, setLanguage] = useState("Hindi");
+  const [fileToolConfig, setFileToolConfig] = useState<FileToolConfig | null>(
+    null,
+  );
+  const [voiceLanguage, setLanguage] = useState<string | null>(null);
+  const language = voiceLanguage ?? (locale === "hi" ? "Hindi" : "English");
   const [micMuted, setMicMuted] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [sharePrompt, setSharePrompt] = useState(false);
@@ -74,7 +91,12 @@ export default function AssistantPage() {
 
   const pushSuggestions = useCallback((items: CopyTextItem[]) => {
     if (items.length === 0) return;
-    setCopyTexts((prev) => [...items, ...prev.filter((c) => !items.some((i) => i.id === c.id))].slice(0, 5));
+    setCopyTexts((prev) =>
+      [
+        ...items,
+        ...prev.filter((c) => !items.some((i) => i.id === c.id)),
+      ].slice(0, 5),
+    );
   }, []);
 
   const endGuide = useCallback(() => {
@@ -98,9 +120,12 @@ export default function AssistantPage() {
     setSharePrompt(false);
   }, [endGuide]);
 
-  useEffect(() => () => {
-    stopSession();
-  }, [stopSession]);
+  useEffect(
+    () => () => {
+      stopSession();
+    },
+    [stopSession],
+  );
 
   const startSession = async () => {
     endGuide();
@@ -120,9 +145,16 @@ export default function AssistantPage() {
       onHighlight: (h) => {
         setHighlight(h);
         if (h?.targetKind === "dropdown") setCopyTexts([]);
-        else if (h?.targetKind === "text_field") pushSuggestions(suggestionsFor(h.label));
+        else if (h?.targetKind === "text_field")
+          pushSuggestions(suggestionsFor(h.label));
       },
-      onProvideText: (item) => setCopyTexts((prev) => [item, ...prev.filter((c) => c.fieldHint !== item.fieldHint)].slice(0, 5)),
+      onProvideText: (item) =>
+        setCopyTexts((prev) =>
+          [item, ...prev.filter((c) => c.fieldHint !== item.fieldHint)].slice(
+            0,
+            5,
+          ),
+        ),
       onSetLanguage: setLanguage,
       onOpenFileTool: setFileToolConfig,
       onInstruction: (text) => {
@@ -130,7 +162,8 @@ export default function AssistantPage() {
       },
       // Lets highlight_region verify a proposed box against the last real
       // frame and reject boxes that land on blank screen (miscalibration).
-      checkRegion: (ymin, xmin, ymax, xmax) => screenRef.current?.regionStddev(ymin, xmin, ymax, xmax) ?? null,
+      checkRegion: (ymin, xmin, ymax, xmax) =>
+        screenRef.current?.regionStddev(ymin, xmin, ymax, xmax) ?? null,
       // Audio-thread heartbeat: drives screen capture even when this tab is
       // backgrounded (user is on the government site's tab).
       onMicTick: () => screenRef.current?.capture(),
@@ -154,7 +187,9 @@ export default function AssistantPage() {
           "[system note] Screen sharing is now ON. A screenshot has been sent. Help with the current task using one visible CTA or input field. Highlight its exact label, then speak naturally. If you cannot read the target, ask for a clearer view. Subsequent screenshots alone do not require a response.",
         );
       };
-      const stream = await share.start((frame) => clientRef.current?.sendScreenFrame(frame));
+      const stream = await share.start((frame) =>
+        clientRef.current?.sendScreenFrame(frame),
+      );
       screenRef.current = share;
       setGuideStream(stream);
       setSharePrompt(false);
@@ -208,7 +243,13 @@ export default function AssistantPage() {
 
   const live = status === "live";
   const avatarState: AvatarState =
-    status === "connecting" ? "connecting" : !live ? "idle" : speaking ? "speaking" : "listening";
+    status === "connecting"
+      ? "connecting"
+      : !live
+        ? "idle"
+        : speaking
+          ? "speaking"
+          : "listening";
 
   const guideState: GuideState = {
     stream: guideStream,
@@ -239,24 +280,34 @@ export default function AssistantPage() {
   return (
     <div className="flex min-h-dvh flex-col bg-[#FFF7EC]">
       {/* top bar */}
-      <header className="flex items-center gap-3 border-b border-orange-200/60 bg-white/70 px-4 py-3 backdrop-blur">
-        <Link href="/" className="flex items-center gap-2 font-bold text-stone-800">
+      <header className="flex flex-wrap items-center gap-3 border-b border-orange-200/60 bg-white/70 px-4 py-3 backdrop-blur">
+        <Link
+          href="/"
+          className="flex items-center gap-2 font-bold text-stone-800"
+        >
           <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-b from-orange-500 via-white to-green-600">
             🙏
           </span>
-          जनसेवक <span className="hidden text-stone-400 sm:inline">· JanSewak</span>
+          {t("जनसेवक")}
         </Link>
-        <div className="ml-auto flex items-center gap-3">
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-3">
+          <LanguageToggle />
           <button
+            aria-label={t("प्रोफ़ाइल")}
             onClick={() => setProfileOpen(true)}
             className="flex items-center gap-1.5 rounded-full border border-stone-300 bg-white px-3 py-1.5 text-sm font-medium text-stone-700 hover:bg-stone-50"
           >
-            👤 <span className="hidden sm:inline">प्रोफ़ाइल</span>
+            👤 <span className="hidden sm:inline">{t("प्रोफ़ाइल")}</span>
           </button>
-          <LanguagePicker value={language} onChange={setLanguage} disabled={live || status === "connecting"} />
+          <LanguagePicker
+            value={language}
+            onChange={setLanguage}
+            disabled={live || status === "connecting"}
+          />
           {live && (
             <span className="flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" /> LIVE
+              <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
+              {t("LIVE")}
             </span>
           )}
         </div>
@@ -269,20 +320,26 @@ export default function AssistantPage() {
             ref={tileRef}
             className="relative flex items-center justify-center overflow-hidden rounded-2xl border border-orange-200/70 bg-gradient-to-b from-[#FFF6E9] via-[#FFEFDB] to-[#FBE3C8] py-2"
           >
-            <Avatar state={avatarState} getLevel={() => clientRef.current?.playback.getLevel() ?? 0} size={avatarSize} />
+            <Avatar
+              state={avatarState}
+              getLevel={() => clientRef.current?.playback.getLevel() ?? 0}
+              size={avatarSize}
+            />
 
             {/* call status chip */}
             <span className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1 text-xs font-semibold text-stone-700 backdrop-blur">
               {live ? (
                 <>
-                  <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" /> LIVE · जनसेवक
+                  <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
+                  {t("LIVE · जनसेवक")}
                 </>
               ) : status === "connecting" ? (
                 <>
-                  <span className="h-2 w-2 animate-pulse rounded-full bg-amber-500" /> जुड़ रही हूँ…
+                  <span className="h-2 w-2 animate-pulse rounded-full bg-amber-500" />
+                  {t("जुड़ रही हूँ…")}
                 </>
               ) : (
-                <>🙏 जनसेवक</>
+                <>{t("🙏 जनसेवक")}</>
               )}
             </span>
 
@@ -292,17 +349,21 @@ export default function AssistantPage() {
                 onClick={startSession}
                 className="absolute bottom-5 rounded-full bg-emerald-700 px-8 py-4 text-lg font-semibold text-white shadow-lg shadow-emerald-700/30 transition hover:bg-emerald-800"
               >
-                🎙️ बात शुरू करें · Start talking
+                {t("🎙️ बात शुरू करें · Start talking")}
               </button>
             ) : status === "connecting" ? (
-              <p className="absolute bottom-7 animate-pulse text-sm font-medium text-stone-600">जुड़ रही हूँ… connecting…</p>
+              <p className="absolute bottom-7 animate-pulse text-sm font-medium text-stone-600">
+                {t("जुड़ रही हूँ… connecting…")}
+              </p>
             ) : (
               <div className="absolute inset-x-0 bottom-4 flex items-center justify-center gap-3">
                 <button
                   onClick={toggleMic}
-                  title={micMuted ? "Mic on करें" : "Mic बंद करें"}
+                  title={micMuted ? t("Mic on करें") : t("Mic बंद करें")}
                   className={`flex h-12 w-12 items-center justify-center rounded-full text-lg shadow-lg ${
-                    micMuted ? "bg-stone-200 text-stone-700" : "bg-emerald-700 text-white"
+                    micMuted
+                      ? "bg-stone-200 text-stone-700"
+                      : "bg-emerald-700 text-white"
                   }`}
                 >
                   {micMuted ? "🔇" : "🎙️"}
@@ -310,15 +371,15 @@ export default function AssistantPage() {
                 {!guideStream && (
                   <button
                     onClick={startScreenShare}
-                    title="स्क्रीन साझा करें — मैं देखकर guide करूँगी"
+                    title={t("स्क्रीन साझा करें — मैं देखकर guide करूँगी")}
                     className="flex h-12 items-center justify-center gap-2 rounded-full bg-[#0B3B8C] px-5 text-sm font-semibold text-white shadow-lg hover:bg-[#0A2F6E]"
                   >
-                    🖥️ Share screen
+                    {t("🖥️ Share screen")}
                   </button>
                 )}
                 <button
                   onClick={stopSession}
-                  title="कॉल समाप्त करें"
+                  title={t("कॉल समाप्त करें")}
                   className="flex h-12 w-12 items-center justify-center rounded-full bg-red-600 text-lg text-white shadow-lg hover:bg-red-700"
                 >
                   ✕
@@ -329,7 +390,10 @@ export default function AssistantPage() {
 
           {status === "error" || status === "closed" ? (
             <div className="w-full rounded-xl border border-red-200 bg-red-50 p-3 text-center text-sm text-red-700">
-              {statusDetail || (status === "closed" ? "Session ended. Reconnect to continue." : "Something went wrong.")}
+              {statusDetail ||
+                (status === "closed"
+                  ? t("Session ended. Reconnect to continue.")
+                  : t("Something went wrong."))}
             </div>
           ) : null}
 
@@ -337,15 +401,13 @@ export default function AssistantPage() {
           {sharePrompt && live && !guideStream && (
             <div className="w-full space-y-2 rounded-xl border-2 border-dashed border-emerald-400 bg-emerald-50 p-4 text-center">
               <p className="text-sm font-medium text-emerald-900">
-                मैं आपकी स्क्रीन देखकर कदम-कदम पर मदद करूँगी।
-                <br />
-                <span className="text-emerald-700">Share your screen so I can guide you on it.</span>
+                {t("मैं आपकी स्क्रीन देखकर कदम-कदम पर मदद करूँगी।")}
               </p>
               <button
                 onClick={startScreenShare}
                 className="rounded-lg bg-emerald-700 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-800"
               >
-                🖥️ स्क्रीन साझा करें · Share screen
+                {t("🖥️ स्क्रीन साझा करें · Share screen")}
               </button>
             </div>
           )}
@@ -358,7 +420,9 @@ export default function AssistantPage() {
                   key={a.id}
                   action={a}
                   onOpen={handleAction}
-                  onDismiss={(id) => setActions((prev) => prev.filter((x) => x.id !== id))}
+                  onDismiss={(id) =>
+                    setActions((prev) => prev.filter((x) => x.id !== id))
+                  }
                 />
               ))}
             </div>
@@ -367,12 +431,17 @@ export default function AssistantPage() {
           {!live && status !== "connecting" && (
             <div className="space-y-2 text-center">
               <p className="max-w-sm text-xs leading-relaxed text-stone-400">
-                माइक की अनुमति दें और अपनी भाषा में बोलें — टिकट, पेंशन, आधार, शिकायत… कुछ भी पूछिए।
+                {t(
+                  "माइक की अनुमति दें और अपनी भाषा में बोलें — टिकट, पेंशन, आधार, शिकायत… कुछ भी पूछिए।",
+                )}
               </p>
               <p className="text-xs text-stone-400">
-                👤 पहले <button onClick={() => setProfileOpen(true)} className="font-semibold text-emerald-700 underline">प्रोफ़ाइल भरें</button> ताकि फॉर्म का text तैयार मिले ·{" "}
-                <a href="/demo/income-tax" target="_blank" className="font-semibold text-emerald-700 underline">
-                  🧪 Sample form पर आज़माएँ
+                <a
+                  href="/demo/income-tax"
+                  target="_blank"
+                  className="font-semibold text-emerald-700 underline"
+                >
+                  {t("🧪 Sample form पर आज़माएँ")}
                 </a>
               </p>
             </div>
@@ -382,47 +451,9 @@ export default function AssistantPage() {
         {/* right: transcript, with its own call controls */}
         <section className="flex min-h-[300px] flex-1 flex-col overflow-hidden rounded-2xl border border-orange-200/70 bg-white/60">
           <div className="flex items-center justify-between gap-2 border-b border-orange-100 px-4 py-2">
-            <span className="text-xs font-semibold uppercase tracking-wide text-stone-400">बातचीत · Conversation</span>
-            <div className="flex items-center gap-1.5">
-              {!live && status !== "connecting" ? (
-                <button
-                  onClick={startSession}
-                  className="rounded-full bg-emerald-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-800"
-                >
-                  🎙️ बात शुरू करें
-                </button>
-              ) : live ? (
-                <>
-                  <button
-                    onClick={toggleMic}
-                    title={micMuted ? "Mic on करें" : "Mic बंद करें"}
-                    className={`rounded-full px-2.5 py-1.5 text-xs font-semibold ${
-                      micMuted ? "bg-stone-200 text-stone-700" : "bg-emerald-700 text-white"
-                    }`}
-                  >
-                    {micMuted ? "🔇" : "🎙️"}
-                  </button>
-                  {!guideStream && (
-                    <button
-                      onClick={startScreenShare}
-                      title="स्क्रीन साझा करें"
-                      className="rounded-full bg-[#0B3B8C] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#0A2F6E]"
-                    >
-                      🖥️ Share
-                    </button>
-                  )}
-                  <button
-                    onClick={stopSession}
-                    title="समाप्त करें"
-                    className="rounded-full bg-red-600 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-red-700"
-                  >
-                    ✕
-                  </button>
-                </>
-              ) : (
-                <span className="animate-pulse text-xs text-stone-400">connecting…</span>
-              )}
-            </div>
+            <span className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+              {t("बातचीत · Conversation")}
+            </span>
           </div>
           <div className="min-h-0 flex-1">
             <TranscriptPanel entries={transcript} />
@@ -452,14 +483,16 @@ export default function AssistantPage() {
         ) : (
           <div className="fixed bottom-4 right-4 z-50 w-[380px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-orange-300 shadow-2xl">
             <div className="flex items-center justify-between bg-orange-100 px-3 py-1.5">
-              <span className="text-xs font-semibold text-orange-900">Guide window</span>
+              <span className="text-xs font-semibold text-orange-900">
+                {t("Guide window")}
+              </span>
               {isDocumentPipSupported() && (
                 <button
                   onClick={popOutGuide}
                   className="rounded px-2 py-0.5 text-xs font-medium text-orange-800 hover:bg-orange-200"
-                  title="Pop out — stays on top of the government website"
+                  title={t("Pop out — stays on top of the government website")}
                 >
-                  ⧉ Pop out (हमेशा ऊपर रहेगा)
+                  {t("⧉ Pop out (हमेशा ऊपर रहेगा)")}
                 </button>
               )}
             </div>
